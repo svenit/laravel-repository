@@ -1,5 +1,5 @@
 {
-    "name": "vy/easy-repository",
+    "name": "vydev/easy-repository",
     "description": "Make your code greate again !",
     "license": "MIT",
     "authors": [
@@ -14,7 +14,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Vy\\EasyRepository\\":"src"
+            "VyDev\\EasyRepository\\":"src"
         }
     }
 }

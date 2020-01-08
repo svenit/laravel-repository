@@ -1,6 +1,6 @@
 <?php
 
-namespace Vy\EasyRepository;
+namespace VyDev\EasyRepository;
 
 use Illuminate\Support\ServiceProvider;
 
