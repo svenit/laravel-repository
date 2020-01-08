@@ -1,0 +1,20 @@
+{
+    "name": "vy/easy-repository",
+    "description": "Make your code greate again !",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Le Quang Vy",
+            "email": "lequangvy812@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^7.1.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Vy\\EasyRepository\\":"src"
+        }
+    }
+}
