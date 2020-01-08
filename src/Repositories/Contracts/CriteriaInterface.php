@@ -1,6 +1,6 @@
 <?php
 
-namespace VyDev\EasyRepository\Vy\Repositories\Contracts;
+namespace VyDev\Repositories\Contracts;
 
 use VyDev\EasyRepository\Vy\Repositories\Criteria\Criteria;
 

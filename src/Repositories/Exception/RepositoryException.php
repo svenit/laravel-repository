@@ -1,6 +1,6 @@
 <?php
 
-namespace VyDev\EasyRepository\Vy\Repositories\Exceptions;
+namespace VyDev\Repositories\Exceptions;
 
 use Exception;
 

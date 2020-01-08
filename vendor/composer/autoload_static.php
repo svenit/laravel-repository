@@ -9,12 +9,12 @@ class ComposerStaticInitb1dbe6ff7bf9aaa8ac1e8319cafbd688
     public static $prefixLengthsPsr4 = array (
         'V' => 
         array (
-            'VyDev\\EasyRepository\\' => 21,
+            'VyDev\\' => 6,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'VyDev\\EasyRepository\\' => 
+        'VyDev\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src',
         ),

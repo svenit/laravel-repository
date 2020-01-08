@@ -1,16 +1,16 @@
 <?php
 
-namespace VyDev\EasyRepository\Vy\Repositories\Eloquent;
+namespace VyDev\Repositories\Eloquent;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Container\Container as App;
-use VyDev\EasyRepository\Vy\Repositories\Criteria\Criteria;
-use VyDev\EasyRepository\Vy\Repositories\Contracts\CriteriaInterface;
-use VyDev\EasyRepository\Vy\Repositories\Contracts\TransformInterface;
-use VyDev\EasyRepository\Vy\Repositories\Contracts\RepositoryInterface;
-use VyDev\EasyRepository\Vy\Repositories\Exceptions\RepositoryException;
+use VyDev\Repositories\Criteria\Criteria;
+use VyDev\Repositories\Contracts\CriteriaInterface;
+use VyDev\Repositories\Contracts\TransformInterface;
+use VyDev\Repositories\Contracts\RepositoryInterface;
+use VyDev\Repositories\Exceptions\RepositoryException;
 
 abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,TransformInterface 
 {
