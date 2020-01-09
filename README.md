@@ -23,8 +23,9 @@ Add ```VyDev\Providers\RepositoryServiceProvider::class```
 
 ```php
 
-...
+
 App\Providers\RouteServiceProvider::class,
+/* */
 VyDev\Providers\RepositoryServiceProvider::class
 
 ```
