@@ -25,7 +25,9 @@ Add ```VyDev\Providers\RepositoryServiceProvider::class```
 
 
 App\Providers\RouteServiceProvider::class,
-/* */
+
+/* Some providers */
+
 VyDev\Providers\RepositoryServiceProvider::class
 
 ```
