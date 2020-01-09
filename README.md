@@ -13,13 +13,28 @@ Run the following command from you terminal:
 
  ```bash
 $ composer require vydev/easy-repository
-$ php artisan vendor:publish --provider "VyDev\Providers\RepositoryServiceProvider"
-$ composer dump-autoload
-$ php artisan optimize:clear
  ```
  
- ## Usage
- 
+## Usage
+
+In ```config/app.php```
+
+Add ```VyDev\Providers\RepositoryServiceProvider::class```
+
+```php
+
+...
+App\Providers\RouteServiceProvider::class,
+VyDev\Providers\RepositoryServiceProvider::class
+
+```
+Then run command
+
+```bash
+php artisan vendor:publish --provider "VyDev\Providers\RepositoryServiceProvider"
+
+```
+
 Edit ```config/repositories.php``` if you want to change Repository store path
 
 **Run command to generate repository file**
