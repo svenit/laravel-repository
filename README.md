@@ -1,10 +1,12 @@
 # Easy Repository
 
-[![Build Status](https://travis-ci.org/Juniorsz/easy-repository.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
+[![Build Status](https://travis-ci.org/Juniorsz/easy-repository.svg?branch=master)](https://travis-ci.org/Juniorsz/easy-repository)
 
 Laravel Repositories is a package for Laravel 5 which is used to abstract the database layer. This makes applications much easier to maintain.
 
 ## Installation
+
+https://packagist.org/packages/vydev/easy-repository
 
 Run the following command from you terminal:
 
@@ -17,13 +19,17 @@ $ php artisan optimize:clear
  ```
  
  ## Usage
+ 
 Edit ```config/repositories.php``` if you want to change Repository store path
+
 **Run command to generate repository file**
 
 Create a new repository
+
 ```sh
 $ php artisan make:repository UserRepository
 ```
+
 Then you can enter the name of Model to automatic generate or skip by enter @
 
 ```php
@@ -173,5 +179,6 @@ public function boot()
 ## Credits
 
 This package was created by Le Quang Vy 
- 
+
+https://packagist.org/packages/vydev/easy-repository
 
