@@ -1,0 +1,20 @@
+<?php 
+
+namespace criteria_namespace;
+
+use VyDev\Repositories\Contracts\RepositoryInterface;
+use VyDev\Repositories\Criteria\Criteria;
+
+class criteria_class extends Criteria {
+
+    /**
+     * @param            $model
+     * @param Repository $repository
+     *
+     * @return mixed
+     */
+    public function apply($model, RepositoryInterface $repository)
+    {
+        return $model;
+    }
+}

@@ -1,0 +1,31 @@
+<?php 
+
+namespace repository_namespace;
+
+use VyDev\Repositories\Eloquent\BaseRepository;
+
+class repository_class extends BaseRepository
+{
+
+    /**
+     * @return string
+     */
+    public function model()
+    {
+        return 'your_model_path';
+    }
+
+    public function boot()
+    {
+        // $this->useTransformer();
+    }
+
+    public function transform($model)
+    {
+        return [
+            'id' => $model->id
+            //
+        ];
+    }
+
+}

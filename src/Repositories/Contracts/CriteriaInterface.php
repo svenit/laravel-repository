@@ -2,7 +2,7 @@
 
 namespace VyDev\Repositories\Contracts;
 
-use VyDev\EasyRepository\Vy\Repositories\Criteria\Criteria;
+use VyDev\Repositories\Criteria\Criteria;
 
 interface CriteriaInterface
 {
