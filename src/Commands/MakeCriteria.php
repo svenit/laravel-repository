@@ -8,7 +8,7 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 class MakeCriteria extends GeneratorCommand
 {
-    protected $name = 'make:criteria';
+    protected $name = 'vy:criteria';
 
     protected $description = 'Create a new criteria.';
 

@@ -2,13 +2,14 @@
 
 namespace VyDev\Commands;
 
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 class MakeRepository extends GeneratorCommand
 {
-    protected $name = 'make:repository';
+    protected $name = 'vy:repository';
 
     protected $description = 'Create a new repository.';
 
@@ -43,6 +44,15 @@ class MakeRepository extends GeneratorCommand
             $this->makeDirectory($path);
             $this->files->put($path, $this->buildClass($this->repositoryClass));
             $this->info($this->type.' created successfully.');
+            if($this->confirm('Would you like to create criteria?'))
+            {
+                $criteriaName = $this->ask('Enter criteria !');
+                if($criteriaName)
+                {
+                    Artisan::call("vy:criteria $criteriaName");
+                    $this->info("Create criteria successfully !");
+                }
+            }
         }
     }
 
