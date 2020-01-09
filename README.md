@@ -1,6 +1,7 @@
 # Easy Repository
 
 [![Build Status](https://travis-ci.org/Juniorsz/easy-repository.svg?branch=master)](https://travis-ci.org/Juniorsz/easy-repository)
+[![Maintainability](https://api.codeclimate.com/v1/badges/69006185e63829b6a304/maintainability)](https://codeclimate.com/github/Juniorsz/easy-repository/maintainability)
 
 Laravel Repositories is a package for Laravel 5 which is used to abstract the database layer. This makes applications much easier to maintain.
 
