@@ -10,7 +10,7 @@ interface RepositoryInterface
 
     public function export();
 
-    public function hidden($columns = ['*']);
+    public function hidden($columns = []);
 
-    public function visible($columns = ['*']);
+    public function visible($columns = []);
 }

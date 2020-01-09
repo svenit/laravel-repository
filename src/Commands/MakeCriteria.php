@@ -8,13 +8,14 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 class MakeCriteria extends GeneratorCommand
 {
-    protected $name = 'vy:criteria';
+    protected $name = 'make:criteria';
 
     protected $description = 'Create a new criteria.';
 
     protected $type = 'Criteria';
 
     private $criteriaClass;
+    private $criteriaPath;
 
     protected $config;
 
@@ -30,7 +31,7 @@ class MakeCriteria extends GeneratorCommand
         if($this->getConfig())
         {
             $this->setRepositoryClass();
-            $path = $this->getPath($this->criteriaClass);
+            $path = $this->getPath($this->criteriaPath);
             if($this->alreadyExists($this->getNameInput())) 
             {
                 $this->error($this->type.' already exists!');
@@ -39,7 +40,6 @@ class MakeCriteria extends GeneratorCommand
             $this->makeDirectory($path);
             $this->files->put($path, $this->buildClass($this->criteriaClass));
             $this->info($this->type.' created successfully.');
-            $this->info("Created criteria : $this->criteriaClass");
         }
     }
 
@@ -60,8 +60,17 @@ class MakeCriteria extends GeneratorCommand
     public function setRepositoryClass()
     {
         $name = ucwords($this->argument('name'));
-        $this->model = $name;
-        $this->criteriaClass = $this->config['criteria_path']."\\".$name;
+        $regex = explode('/',$name);
+        $modelName = $regex[count($regex) - 1];
+        $this->model = $modelName;
+        foreach($regex as $namespace)
+        {
+            $this->config['criteria_path'] .= "\\".$namespace;
+        }
+        $this->criteriaPath = $this->config['criteria_path'];
+        $explode = explode("\\",$this->criteriaPath);
+        array_pop($explode);
+        $this->criteriaClass = implode("\\",$explode);
         return $this;
     }
     protected function replaceClass($stub, $name)
@@ -71,7 +80,7 @@ class MakeCriteria extends GeneratorCommand
             throw new InvalidArgumentException("Missing required argument model name");
         }
         $stub = parent::replaceClass($stub, $name);
-        $replace = str_replace('criteria_namespace',$this->config['criteria_path'], $stub);
+        $replace = str_replace('criteria_namespace',$this->criteriaClass, $stub);
         $replace = str_replace('criteria_class', $this->model, $replace);
         return $replace;
     }

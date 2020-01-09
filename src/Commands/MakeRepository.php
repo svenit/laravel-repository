@@ -8,13 +8,14 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 class MakeRepository extends GeneratorCommand
 {
-    protected $name = 'vy:repository';
+    protected $name = 'make:repository';
 
     protected $description = 'Create a new repository.';
 
     protected $type = 'Repository';
 
     private $repositoryClass;
+    private $repositoryPath;
 
     protected $config;
 
@@ -32,7 +33,7 @@ class MakeRepository extends GeneratorCommand
         if($this->getConfig())
         {
             $this->setRepositoryClass();
-            $path = $this->getPath($this->repositoryClass);
+            $path = $this->getPath($this->repositoryPath);
             if($this->alreadyExists($this->getNameInput())) 
             {
                 $this->error($this->type.' already exists!');
@@ -42,7 +43,6 @@ class MakeRepository extends GeneratorCommand
             $this->makeDirectory($path);
             $this->files->put($path, $this->buildClass($this->repositoryClass));
             $this->info($this->type.' created successfully.');
-            $this->info("Created Repository : $this->repositoryClass");
         }
     }
 
@@ -63,8 +63,17 @@ class MakeRepository extends GeneratorCommand
     public function setRepositoryClass()
     {
         $name = ucwords($this->argument('name'));
-        $this->model = $name;
-        $this->repositoryClass = $this->config['repository_path']."\\".$name;
+        $regex = explode('/',$name);
+        $modelName = $regex[count($regex) - 1];
+        $this->model = $modelName;
+        foreach($regex as $namespace)
+        {
+            $this->config['repository_path'] .= "\\".$namespace;
+        }
+        $this->repositoryPath = $this->config['repository_path'];
+        $explode = explode("\\",$this->repositoryPath);
+        array_pop($explode);
+        $this->repositoryClass = implode("\\",$explode);
         return $this;
     }
     protected function replaceClass($stub, $name)
@@ -74,7 +83,7 @@ class MakeRepository extends GeneratorCommand
             throw new InvalidArgumentException("Missing required argument model name");
         }
         $stub = parent::replaceClass($stub, $name);
-        $replace = str_replace('repository_namespace',$this->config['repository_path'], $stub);
+        $replace = str_replace('repository_namespace',$this->repositoryClass, $stub);
         $replace = str_replace('repository_class', $this->model, $replace);
         if(isset($this->modelPath) && $this->modelPath != '@')
         {
