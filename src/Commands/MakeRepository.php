@@ -9,7 +9,7 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 class MakeRepository extends GeneratorCommand
 {
-    protected $name = 'vy:repository';
+    protected $name = 'make:repository';
 
     protected $description = 'Create a new repository.';
 

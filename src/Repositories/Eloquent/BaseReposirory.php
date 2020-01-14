@@ -35,7 +35,6 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
 
     public function initialize()
     {
-        $this->transform = false;
         $this->skipCriteria = false;
     }
     
@@ -107,23 +106,29 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
             $this->removeCriteria($criteria);
         }
     }
-    /**
-     * Set transformer status equal true
-     * @param null
-     * @return void
-     * 
-    */
-    public function useTransformer()
-    {
-        $this->transform = true;
-    }
 
     public function setTransform()
     {
-        $this->model->map(function($item,$key){
-            $this->model[$key] = $this->transform($item);
-        });
-        return $this;
+        if($this->transform)
+        {
+            if(isset($this->model[0]))
+            {
+                $this->model->map(function($item,$key){
+                    collect($this->transform($item))->map(function($trans,$index) use ($key){
+                        unset($this->model[$key][$trans['field']]);
+                        return $this->model[$key][$index] = $trans['value'];
+                    });
+                });
+            }
+            else
+            {
+                collect($this->transform($this->model))->map(function($trans,$index){
+                    unset($this->model[$trans['field']]);
+                    return $this->model[$index] = $trans['value'];
+                });
+            }
+            return $this;
+        }
     }
 
     public function all()
@@ -316,6 +321,14 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
         return $this;
     }
 
+    public function search($fields,$value)
+    {
+        foreach(Arr::wrap($fields) as $builder)
+        {
+            $this->model = $this->model->orWhere($builder,'LIKE',"%$value%");
+        }
+        return $this;
+    }
     public function hidden($columns = ['*'])
     {
         $this->model = $this->model->setHidden(Arr::wrap($columns));
@@ -330,10 +343,7 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
 
     public function export()
     {
-        if($this->transform)
-        {
-            $this->setTransform();
-        }
+        $this->setTransform();
         return $this->model;
     }
 
