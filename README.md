@@ -61,9 +61,8 @@ use VyDev\Repositories\Eloquent\BaseRepository;
 class UserRepository extends BaseRepository
 {
 
-    /**
-     * @return string
-     */
+    protected $transform = false;
+
     public function model()
     {
         return 'App\\User';
@@ -71,15 +70,25 @@ class UserRepository extends BaseRepository
 
     public function boot()
     {
-        // $this->useTransformer();
+        // $this->pushCriteria(new YourCriteria());
     }
 
     public function transform($model)
     {
         return [
-            'id' => $model->id
+            'id' => [
+                'field' => 'id',
+                'value' => $model->id
+            ]
             //
         ];
+    }
+
+    /* You can define your customize function bellow */
+
+    public function countPosts()
+    {
+        return $this->withCount('posts');
     }
 
 }
@@ -94,21 +103,22 @@ namespace App\Http\Controllers\User;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Repositories\Eloquent\UserRepository;
+use App\Repositories\Eloquent\UserRepository as User;
 
 class IndexController extends Controller
 {
     protected $user;
 
-    public function __construct(UserRepository $user)
+    public function __construct(User $user)
     {
         $this->user = $user;
     }
     public function index()
     {
-        $users = $this->user->all()->export();
-        $firstUserPosts = $this->user->with('posts')->get()->export();
+        $users = $this->user->all();
+        $firstUserPosts = $this->user->with('posts')->get();
     }
+
 }
 ```
 
@@ -125,14 +135,8 @@ namespace App\Repositories\Criteria\User;
 use VyDev\Repositories\Contracts\RepositoryInterface;
 use VyDev\Repositories\Criteria\Criteria;
 
-class UserActive extends Criteria {
-
-    /**
-     * @param            $model
-     * @param Repository $repository
-     *
-     * @return mixed
-     */
+class UserActive extends Criteria 
+{
     public function apply($model, RepositoryInterface $repository)
     {
         $model = $model->where('active',1);
@@ -145,12 +149,33 @@ To use Criteria
 
 ```php
 namespace App\Http\Controllers\User;
-....
-public function index()
+
+use App\Repositories\Criteria\UserActive;
+
+public function testPushCriteria()
 {
+    /* Uncomment to view the change ^^ */
     $this->user->pushCriteria(new UserActive());
-    return $this->user->all()->export();
+    // return $this->user->all();
+    $this->user->skipCriteria();
+    // return $this->user->all();
 }
+public function testGetByCriteria()
+{
+    /* If you only want to load a specific Criteria, let do this */
+    return $this->user->getByCriteria(new UserActive());
+}
+
+public function testRemoveCriteria()
+{
+    /* If you have 2 or more criteria and you want to remove one of theme */
+    $this->user->pushManyCriterias(new UserActive(),new UserHaveFivePosts());
+    /* Delete a specific criteria */
+    $this->user->removeCriteria(new UserHaveFivePosts());
+
+    return $this->user->all();
+}
+
 ```
 Criteria Interface
 ```php
@@ -165,20 +190,19 @@ public function removeManyCriterias(...$criterias);
 
 ## Transform
 
-In ```Repositories\Eloquent```
+In ```App\Repositories\Eloquent\UserRepository```
 ```php
 
-public function boot()
-{
-    $this->useTransformer(); // Use transform
-}
+protected $transform = true; // Define true to use transfomer
+
 public function transform($model)
 {
     return [
-        'id' => $model->id
-        'name' => $model->first_name." ".$model->last_name,
-        'point' => $model->point + 10
-        //
+        'id' => [
+            'field' => 'id', // The id field in users table
+            'value' => $model->id // The new data for id field, Example : value => $model->id + 10
+        ]
+        // Some...
     ];
 }
 ```
@@ -188,10 +212,12 @@ public function transform($model)
 To use global criteria 
 
 ```php
+
+use App\Repositories\Criteria\UserActive;
+
 public function boot()
 {
     $this->pushCriteria(new UserActive());
-    // $this->useTransformer();
 }
 ```
 
