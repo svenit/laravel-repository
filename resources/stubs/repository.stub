@@ -4,6 +4,11 @@ namespace repository_namespace;
 
 use VyDev\Repositories\Eloquent\BaseRepository;
 
+/**
+    @author : Lê Quang Vỹ
+    @feedback : https://github.com/Juniorsz/easy-repository/issues
+*/
+
 class repository_class extends BaseRepository
 {
 
@@ -16,7 +21,7 @@ class repository_class extends BaseRepository
 
     public function boot()
     {
-        
+        // $this->pushCriteria(new YourCriteria());
     }
 
     public function transform($model)

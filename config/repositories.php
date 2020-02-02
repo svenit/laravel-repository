@@ -1,6 +1,7 @@
 <?php
 return [
     /*
+    @author : Lê Quang Vỹ
     |--------------------------------------------------------------------------
     | Repository namespace
     |--------------------------------------------------------------------------
@@ -27,5 +28,6 @@ return [
     | The namespace for the criteria classes.
     |
     */
-    'default_model' => 'App',
+    'default_model' => 'App', // Example : App\\Model
+
 ];

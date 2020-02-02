@@ -12,6 +12,10 @@ use VyDev\Repositories\Contracts\TransformInterface;
 use VyDev\Repositories\Contracts\RepositoryInterface;
 use VyDev\Repositories\Exceptions\RepositoryException;
 
+/**
+ * @author : Lê Quang Vỹ
+ * @feedback : https://github.com/Juniorsz/easy-repository/issues
+ */
 abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,TransformInterface 
 {
     private $model;
@@ -134,15 +138,13 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
     public function all()
     {
         $this->applyCriteria();
-        $this->model = $this->model->all();
-        return $this;
+        return $this->model->all();
     }
 
-    public function get($columns = ['*'])
+    public function get($columns = '*')
     {
         $this->applyCriteria();
-        $this->model = $this->model->get(Arr::wrap($columns));
-        return $this;
+        return $this->model->get($columns);
     }
     public function first()
     {
@@ -351,6 +353,5 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
     {
         $this->makeModel();
     }
-    
 
 }

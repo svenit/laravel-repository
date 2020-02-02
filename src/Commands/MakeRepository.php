@@ -49,7 +49,7 @@ class MakeRepository extends GeneratorCommand
                 $criteriaName = $this->ask('Enter criteria !');
                 if($criteriaName)
                 {
-                    Artisan::call("vy:criteria $criteriaName");
+                    Artisan::call("make:criteria $criteriaName");
                     $this->info("Create criteria successfully !");
                 }
             }
