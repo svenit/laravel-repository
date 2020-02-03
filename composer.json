@@ -1,13 +1,20 @@
 {
     "name": "vydev/easy-repository",
-    "description": "Make your code greate again !",
+    "description": "Laravel Repositories is a package for Laravel 5 which is used to abstract the database layer. This makes applications much easier to maintain.",
     "license": "MIT",
     "authors": [
         {
-            "name": "Le Quang Vy",
-            "email": "lequangvy812@gmail.com"
+            "name": "Lê Quang Vỹ",
+            "email": "lequangvy2k@gmail.com",
+            "facebook":"https://facebook.com/sven307"
         }
     ],
+    "keywords":{
+        "Laravel",
+        "Laravel Repository",
+        "VyDev",
+        "Easy Repository"
+    },
     "minimum-stability": "dev",
     "require": {
         "php": "^7.1.3"
