@@ -4,6 +4,7 @@ namespace VyDev\Repositories\Eloquent;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use VyDev\Repositories\Criteria\Criteria;
@@ -19,6 +20,7 @@ use VyDev\Repositories\Exceptions\RepositoryException;
  */
 abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,TransformInterface 
 {
+
     private $model;
 
     protected $app;
@@ -26,6 +28,7 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
     protected $criteria;
     protected $transform;
     protected $skipCriteria;
+    protected $storeKeys = [];
 
     public function __construct(App $app,Collection $collection)
     {
@@ -94,7 +97,7 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
     public function reset()
     {
         $this->criteria = new Collection;
-        $this->resetModel();
+        $this->makeModel();
     }
 
     public function pushCriteria(Criteria $criteria)
@@ -176,10 +179,17 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
         }
     }
 
-    public function all()
+    public function all($columns = '*')
     {
         $this->applyCriteria();
-        $this->model = $this->model->all();
+        if($this->model instanceof Builder)
+        {
+            $this->model = $this->model->get($columns);
+        }
+        else
+        {
+            $this->model = $this->model->all();
+        }
         return $this;
     }
 
@@ -193,6 +203,20 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
     {
         $this->applyCriteria();
         $this->model = $this->model->first();
+        return $this;
+    }
+
+    public function lastest()
+    {
+        $this->applyCriteria();
+        $this->model = $this->model->lastest();
+        return $this;
+    }
+
+    public function random()
+    {
+        $this->applyCriteria();
+        $this->model = $this->model->inRandomOrder();
         return $this;
     }
 
@@ -264,6 +288,13 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
         return $this;
     }
 
+    public function skip($skip)
+    {
+        $this->applyCriteria();
+        $this->model = $this->model->skip($skip);
+        return $this;
+    }
+
     public function paginate($limit = 15, $columns = ['*'])
     {
         $this->applyCriteria();
@@ -275,6 +306,27 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
     {
         $this->applyCriteria();
         $this->model = $this->model->where($field, $value);
+        return $this;
+    }
+
+    public function whereNotNull($field)
+    {
+        $this->applyCriteria();
+        $this->model = $this->model->whereNotNull($field);
+        return $this;
+    }
+
+    public function whereNull($field)
+    {
+        $this->applyCriteria();
+        $this->model = $this->model->whereNull($field);
+        return $this;
+    }
+
+    public function when($field,...$closure)
+    {
+        $this->applyCriteria();
+        $this->model = $this->model->when($field, $closure);
         return $this;
     }
     
@@ -359,6 +411,18 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
         return $this;
     }
 
+    public function orderByDesc($field)
+    {
+        $this->model = $this->model->orderByDesc($field);
+        return $this;
+    }
+
+    public function orderByAsc($field)
+    {
+        $this->model = $this->model->orderByAsc($field);
+        return $this;
+    }
+
     public function load($relation)
     {
         $this->applyCriteria();
@@ -396,12 +460,63 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
     public function export()
     {
         $this->setTransform();
-        return $this->model;
+        $result = $this->model;
+        $this->reset();
+        return $result;
     }
 
-    public function resetModel()
+    public function exportWithCache($cacheKeys,$time = null)
     {
-        $this->makeModel();
+        $this->storeKeys[] = $cacheKeys;
+
+        $this->setTransform();
+        $result = $this->model;
+        $this->reset();
+
+        if(is_int($time))
+        {
+            return Cache::remember("{$this->model()}.$cacheKeys", $time, function () use($result) {
+                return $result;
+            });
+        }
+        else
+        {
+            return Cache::rememberForever("{$this->model()}.$cacheKeys", function () use($result) {
+                return $result;
+            });
+        }
+    }
+    /**
+     * Remove a specific cache key
+     * @param : $cacheKeys
+     */
+    public function forgetCache($cacheKeys)
+    {
+        $this->storeKeys = array_diff($this->storeKeys,[$cacheKeys]);
+        return Cache::forget("{$this->model()}.$cacheKeys");
+    }
+
+    /**
+     * Mapping cache keys and remove cache
+     */
+    public function flushCaches()
+    {
+        collect($this->storeKeys)->each(function($key){
+            $this->forgetCache($key);
+        });
+    }
+    /**
+     * Call default Model methods when user trigger undefined method in repository
+     */
+    public static function __callStatic($method, $arguments)
+    {
+        return call_user_func_array([new static(), $method], $arguments);
+    }
+
+    public function __call($method, $arguments)
+    {
+        $this->applyCriteria();
+        return call_user_func_array([$this->model, $method], $arguments);
     }
 
 }

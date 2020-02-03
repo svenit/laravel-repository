@@ -117,6 +117,13 @@ class IndexController extends Controller
     {
         $users = $this->user->all()->export();
         $firstUserPosts = $this->user->with('posts')->get()->export();
+        /* If you want set cache in range of a time */
+        $cacheKey = 'first-user-posts';
+        $time = 10;
+        $firstUserPosts = $this->user->with('posts')->get()->exportWithCache($cacheKey,$time);
+        /* Set cache forever */
+        $firstUserPosts = $this->user->with('posts')->get()->exportWithCache($cacheKey); // Set only cache key
+
     }
 
 }
