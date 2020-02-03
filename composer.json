@@ -9,12 +9,12 @@
             "facebook":"https://facebook.com/sven307"
         }
     ],
-    "keywords":{
+    "keywords":[
         "Laravel",
         "Laravel Repository",
         "VyDev",
         "Easy Repository"
-    },
+    ],
     "minimum-stability": "dev",
     "require": {
         "php": "^7.1.3"
