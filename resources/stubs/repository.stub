@@ -29,9 +29,10 @@ class repository_class extends BaseRepository
         return [
             'id' => [
                 'field' => 'id',
-                'value' => $model->id
+                'value' => $model->id,
+                'visible' => true
             ]
-            //
+            // Some...
         ];
     }
 

@@ -138,16 +138,38 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
             {
                 $this->model->map(function($item,$key){
                     collect($this->transform($item))->map(function($trans,$index) use ($key){
-                        unset($this->model[$key][$trans['field']]);
-                        return $this->model[$key][$index] = $trans['value'];
+                        if(array_key_exists('visible',$trans))
+                        {
+                            if($trans['visible'])
+                            {
+                                unset($this->model[$key][$trans['field']]);
+                                return $this->model[$key][$index] = $trans['value'];
+                            }
+                        }
+                        else
+                        {
+                            unset($this->model[$key][$trans['field']]);
+                            return $this->model[$key][$index] = $trans['value'];
+                        }
                     });
                 });
             }
             else
             {
                 collect($this->transform($this->model))->map(function($trans,$index){
-                    unset($this->model[$trans['field']]);
-                    return $this->model[$index] = $trans['value'];
+                    if(array_key_exists('visible',$trans))
+                    {
+                        if($trans['visible'])
+                        {
+                            unset($this->model[$trans['field']]);
+                            return $this->model[$index] = $trans['value'];
+                        }
+                    }
+                    else
+                    {
+                        unset($this->model[$trans['field']]);
+                        return $this->model[$index] = $trans['value'];
+                    }
                 });
             }
             return $this;
@@ -228,21 +250,21 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
         return $this;
     }
 
-    public function limit($limit)
+    public function limit($limit = 15)
     {
         $this->applyCriteria();
         $this->model = $this->model->limit($limit);
         return $this;
     }
 
-    public function take($limit)
+    public function take($take = 15)
     {
         $this->applyCriteria();
-        $this->model = $this->model->take($limit);
+        $this->model = $this->model->take($take);
         return $this;
     }
 
-    public function paginate($limit = null, $columns = ['*'])
+    public function paginate($limit = 15, $columns = ['*'])
     {
         $this->applyCriteria();
         $this->model = $this->model->paginate($limit, $columns);

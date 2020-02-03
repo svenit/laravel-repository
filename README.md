@@ -24,10 +24,9 @@ Add ```VyDev\Providers\RepositoryServiceProvider::class```
 
 ```php
 
-
-App\Providers\RouteServiceProvider::class,
-
-/* Some providers */
+/*
+* Package Service Providers...
+*/
 
 VyDev\Providers\RepositoryServiceProvider::class
 
@@ -115,8 +114,8 @@ class IndexController extends Controller
     }
     public function index()
     {
-        $users = $this->user->all();
-        $firstUserPosts = $this->user->with('posts')->get();
+        $users = $this->user->all()->export();
+        $firstUserPosts = $this->user->with('posts')->get()->export();
     }
 
 }
@@ -173,7 +172,7 @@ public function testRemoveCriteria()
     /* Delete a specific criteria */
     $this->user->removeCriteria(new UserHaveFivePosts());
 
-    return $this->user->all();
+    return $this->user->all()->export();
 }
 
 ```
@@ -200,7 +199,8 @@ public function transform($model)
     return [
         'id' => [
             'field' => 'id', // The id field in users table
-            'value' => $model->id // The new data for id field, Example : value => $model->id + 10
+            'value' => $model->id // The new data for id field, Example : value => $model->id + 10,
+            'visible' => true // Show or hidden, if you delete this key, default value is true
         ]
         // Some...
     ];
@@ -209,7 +209,7 @@ public function transform($model)
 
 ## Global Criteria
 
-To use global criteria 
+To use global criteria or somethings else
 
 ```php
 
@@ -223,7 +223,12 @@ public function boot()
 
 ## Credits
 
-This package was created by Le Quang Vy 
+This package was created by Lê Quang Vỹ
+
+------------------- Contact ----------------------
+
+Facebook : https://www.facebook.com/sven307
+Email : lequangvy2k@gmail.com
 
 https://packagist.org/packages/vydev/easy-repository
 
