@@ -5,8 +5,9 @@ namespace VyDev\Repositories\Eloquent;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Container\Container as App;
+use Illuminate\Database\Eloquent\Builder;
 use VyDev\Repositories\Criteria\Criteria;
+use Illuminate\Container\Container as App;
 use VyDev\Repositories\Contracts\CriteriaInterface;
 use VyDev\Repositories\Contracts\TransformInterface;
 use VyDev\Repositories\Contracts\RepositoryInterface;
@@ -21,6 +22,7 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
     private $model;
 
     protected $app;
+    protected $globalCriteria;
     protected $criteria;
     protected $transform;
     protected $skipCriteria;
@@ -29,6 +31,7 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
     {
         $this->app = $app;
         $this->criteria = $collection;
+        $this->globalCriteria = new Collection();
         $this->initialize();
         $this->makeModel();
         $this->boot();
@@ -54,17 +57,26 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
 
     public function applyCriteria()
     {
-        if(!$this->skipCriteria)
+        if($this->skipCriteria)
         {
-            foreach($this->criteria as $criteria)
-            {
-                if($criteria instanceof Criteria)
-                {
-                    $this->model = $criteria->apply($this->model,$this);
-                }
-            }
+            $this->reset();
+        }
+        else
+        {
+            $this->mappingCriteria($this->globalCriteria);
+            $this->mappingCriteria($this->criteria);
         }
         return $this;
+    }
+
+    public function mappingCriteria($criterias)
+    {
+        $criterias->each(function($criteria){
+            if($criteria instanceof Criteria)
+            {
+                $this->model = $criteria->apply($this->model,$this);
+            }
+        });
     }
 
     public function skipCriteria()
@@ -74,15 +86,22 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
 
     public function getByCriteria(Criteria $criteria)
     {
+        $this->reset();
         $this->model = $criteria->apply($this->model,$this);
         return $this;
+    }
+
+    public function reset()
+    {
+        $this->criteria = new Collection;
+        $this->resetModel();
     }
 
     public function pushCriteria(Criteria $criteria)
     {
         if($criteria instanceof Criteria)
         {
-            $this->criteria->push($criteria);
+            $this->globalCriteria->push($criteria);
         }
         return $this;
     }
@@ -98,7 +117,7 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
 
     public function removeCriteria(Criteria $criteria)
     {
-        $this->criteria = $this->criteria->reject(function($item) use ($criteria){
+        $this->globalCriteria = $this->globalCriteria->reject(function($item) use ($criteria){
             return $item == $criteria;
         });
     }
@@ -138,13 +157,15 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
     public function all()
     {
         $this->applyCriteria();
-        return $this->model->all();
+        $this->model = $this->model->all();
+        return $this;
     }
 
     public function get($columns = '*')
     {
         $this->applyCriteria();
-        return $this->model->get($columns);
+        $this->model = $this->model->get($columns);
+        return $this;
     }
     public function first()
     {
@@ -294,6 +315,13 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
     {
         $this->applyCriteria();
         $this->model = $this->model->withCount($relations);
+        return $this;
+    }
+
+    public function loadCount($relations)
+    {
+        $this->applyCriteria();
+        $this->model = $this->model->loadCount($relations);
         return $this;
     }
 
