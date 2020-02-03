@@ -77,7 +77,8 @@ class UserRepository extends BaseRepository
         return [
             'id' => [
                 'field' => 'id',
-                'value' => $model->id
+                'value' => $model->id,
+                'visible' => true
             ]
             //
         ];
@@ -228,6 +229,7 @@ This package was created by Lê Quang Vỹ
 ------------------- Contact ----------------------
 
 Facebook : https://www.facebook.com/sven307
+
 Email : lequangvy2k@gmail.com
 
 https://packagist.org/packages/vydev/easy-repository
