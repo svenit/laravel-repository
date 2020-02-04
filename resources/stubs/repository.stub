@@ -5,8 +5,8 @@ namespace repository_namespace;
 use VyDev\Repositories\Eloquent\BaseRepository;
 
 /**
-    @author : Lê Quang Vỹ
-    @feedback : https://github.com/Juniorsz/easy-repository/issues
+    *@author : Lê Quang Vỹ
+    *@feedback : https://github.com/Juniorsz/easy-repository/issues
 */
 
 class repository_class extends BaseRepository

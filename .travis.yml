@@ -7,16 +7,6 @@ php:
   - 7.1.3
 
 before_script:
-<<<<<<< HEAD
-  - cp .env.travis .env
-  - composer self-update
-  - composer require vydev/easy-repository
-
-script:
-  - vendor/bin/phpunit
-  
-=======
   - composer install --no-interaction
 
 script:
->>>>>>> b81646dbba3df9bfcee20fdbf1c41088ca01da26
