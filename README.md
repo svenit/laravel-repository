@@ -50,12 +50,32 @@ $ php artisan make:repository UserRepository
 
 Then you can enter the name of Model to automatic generate or skip by enter @
 
+If console throw error ```Command "make:repository" is not defined."``` 
+
+In : ```app/Console/Kernel.php```
+
+```php
+
+use VyDev\Commands\MakeCriteria;
+use VyDev\Commands\MakeRepository;
+
+protected $commands = [
+    MakeCriteria::class,
+    MakeRepository::class
+];
+
+```
+Then run ```php artisan optimize:clear```
+
+
 ```php
 <?php 
 
 namespace App\Repositories\Eloquent;
 
 use VyDev\Repositories\Eloquent\BaseRepository;
+use VyDev\Repositories\Criteria\AdvancedSearchCriteria;
+
 
 class UserRepository extends BaseRepository
 {
@@ -69,7 +89,8 @@ class UserRepository extends BaseRepository
 
     public function boot()
     {
-        // $this->pushCriteria(new YourCriteria());
+        /* Uncomment if you want to use advanced search */
+        // $this->pushCriteria(new AdvancedSearchCriteria());
     }
 
     public function transform($model)
@@ -168,6 +189,7 @@ public function search($fields,$value);
 public function hidden($columns = ['*']);
 public function visible($columns = ['*']);
 public function export();
+public function exportWithCache($cacheKey,$time);
 
 ```
 
@@ -226,15 +248,26 @@ public function testRemoveCriteria()
     return $this->user->all()->export();
 }
 
+public function pushWithCondition(Request $request)
+{
+    $condition = $request->status == 'active' ? true : false;
+
+    $this->user->pushCriteriaWhen([
+        $condition => new FilterActiveUser(),
+        // Somethings else
+    ]);
+}
 ```
 Criteria Interface
 ```php
 public function applyCriteria();
 public function pushCriteria(Criteria $criteria);
+public function pushCriteriaWhen($arguments);
+public function pushManyCriterias(...$criterias);
 public function skipCriteria();
 public function getByCriteria(Criteria $criteria);
-public function pushManyCriterias(...$criterias);
 public function removeCriteria(Criteria $criteria);
+public function pushCriteriaWhen($arguments);
 public function removeManyCriterias(...$criterias);
 ```
 
@@ -264,12 +297,112 @@ To use global criteria or somethings else
 
 ```php
 
-use App\Repositories\Criteria\UserActive;
+use VyDev\Repositories\Criteria\AdvancedSearchCriteria;
 
 public function boot()
 {
-    $this->pushCriteria(new UserActive());
+    $this->pushCriteria(new AdvancedSearchCriteria());
 }
+```
+
+Request all data without filter by request
+
+```https://yourdomain.example/products```
+
+```json
+[
+    {
+        id: 1,
+        cate_id: 2,
+        producer_id: 3,
+        name: "TV Sam Sung",
+        price: 2200,
+    },
+    {
+        id: 2,
+        cate_id: 1,
+        producer_id: 3,
+        name: "Air Conditioner Sony",
+        price: 3600,
+    },
+    {
+        id: 3,
+        cate_id: 1,
+        producer_id: 3,
+        name: "Air Conditioner Sam Sung",
+        price: 3650,
+    },
+    {
+        id: 4,
+        cate_id: 7,
+        producer_id: 5,
+        name: "Smart Phone LG",
+        price: 1200,
+    }
+]
+```
+Try it : 
+
+```https://yourdomain.example/products?search=name:LIKE:Sam%20Sung```
+
+```json
+[
+    {
+        id: 1,
+        cate_id: 2,
+        producer_id: 3,
+        name: "TV Sam Sung",
+        price: 2200,
+    },
+    {
+        id: 3,
+        cate_id: 1,
+        producer_id: 3,
+        name: "Air Conditioner Sam Sung",
+        price: 3650,
+    }
+]
+```
+
+```https://yourdomain.example/products?search=name:LIKE:Sam%20Sung;id:=:3```
+
+```json
+[
+    {
+        id: 3,
+        cate_id: 1,
+        producer_id: 3,
+        name: "Air Conditioner Sam Sung",
+        price: 3650,
+    }
+]
+```
+
+```https://yourdomain.example/products?search=name:LIKE:Sam%20Sung;id:=:3&filter=name```
+
+```json
+[
+    {
+        name: "Air Conditioner Sam Sung",
+    }
+]
+```
+
+Load a relation and filter ( .* to get all data )
+
+```https://yourdomain.example/products?search=name:LIKE:Sam%20Sung;id:=:3&filter=name;producer.id,name```
+
+```json
+[
+    {
+        name: "Air Conditioner Sam Sung",
+        producer_id: 3,
+        producer: {
+            id: 3,
+            name: "Sam Sung"
+        }
+    }
+]
 ```
 
 ## Credits

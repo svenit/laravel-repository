@@ -19,7 +19,7 @@ interface RepositoryInterface
     public function limit($limit);
     public function take($take);
     public function paginate($limit = 15, $columns = ['*']);
-    public function where($field, $value = null);
+    public function where($field,$operator, $value = null);
     public function whereIn($field,$values);
     public function whereNotIn($field,$values);
     public function whereBetween($field,$values);

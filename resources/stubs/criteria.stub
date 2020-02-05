@@ -7,7 +7,7 @@ use VyDev\Repositories\Criteria\Criteria;
 
 /**
     *@author : Lê Quang Vỹ
-    *@feedback : https://github.com/Juniorsz/easy-repository/issues
+    *@issues : https://github.com/Juniorsz/easy-repository/issues
 */
 
 class criteria_class extends Criteria 

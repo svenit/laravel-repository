@@ -1,7 +1,11 @@
 <?php
+
+/**
+ *@author : Lê Quang Vỹ
+ */
+
 return [
     /*
-    @author : Lê Quang Vỹ
     |--------------------------------------------------------------------------
     | Repository namespace
     |--------------------------------------------------------------------------
@@ -29,5 +33,34 @@ return [
     |
     */
     'default_model' => 'App', // Example : App\\Model
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cache will be clear when a action bellow was triggered
+    |--------------------------------------------------------------------------
+    |
+    | Config cacheable
+    |
+    */
+    'cache' => [
+        'clear' => [
+            'created' => true,
+            'deleted' => true,
+            'updated' => true
+        ]
+    ],
+
+    /*
+    / Something else
+    */
+
+    'pagination' => [
+        'limit' => 15
+    ],
+
+    'parameters' => [
+        'search' => 'search', // Define your custom search keyword
+        'filter' => 'filter' // Define your custom filter keyword
+    ]
 
 ];

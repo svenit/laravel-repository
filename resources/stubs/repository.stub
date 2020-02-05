@@ -3,10 +3,11 @@
 namespace repository_namespace;
 
 use VyDev\Repositories\Eloquent\BaseRepository;
+use VyDev\Repositories\Criteria\AdvancedSearchCriteria;
 
 /**
     *@author : Lê Quang Vỹ
-    *@feedback : https://github.com/Juniorsz/easy-repository/issues
+    *@issues : https://github.com/Juniorsz/easy-repository/issues
 */
 
 class repository_class extends BaseRepository
@@ -21,7 +22,8 @@ class repository_class extends BaseRepository
 
     public function boot()
     {
-        // $this->pushCriteria(new YourCriteria());
+        /* Uncomment if you want to use advanced search */
+        // $this->pushCriteria(new AdvandedSearchCriteria());
     }
 
     public function transform($model)
@@ -36,4 +38,7 @@ class repository_class extends BaseRepository
         ];
     }
 
+    /**
+        * Your custom function
+    */
 }

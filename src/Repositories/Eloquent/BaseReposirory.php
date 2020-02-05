@@ -3,12 +3,14 @@
 namespace VyDev\Repositories\Eloquent;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use VyDev\Repositories\Criteria\Criteria;
 use Illuminate\Container\Container as App;
+use VyDev\Repositories\Criteria\AdvancedSearchCriteria;
 use VyDev\Repositories\Contracts\CriteriaInterface;
 use VyDev\Repositories\Contracts\TransformInterface;
 use VyDev\Repositories\Contracts\RepositoryInterface;
@@ -16,28 +18,34 @@ use VyDev\Repositories\Exceptions\RepositoryException;
 
 /**
  * @author : Lê Quang Vỹ
- * @feedback : https://github.com/Juniorsz/easy-repository/issues
+ * @issues : https://github.com/Juniorsz/easy-repository/issues
  */
 abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,TransformInterface 
 {
 
     private $model;
 
-    protected $app;
     protected $globalCriteria;
     protected $criteria;
     protected $transform;
     protected $skipCriteria;
     protected $storeKeys = [];
+    protected $config;
 
-    public function __construct(App $app,Collection $collection)
+    public function __construct()
     {
-        $this->app = $app;
-        $this->criteria = $collection;
+        $this->criteria = new Collection();
         $this->globalCriteria = new Collection();
+        $this->config = (OBJECT)[
+            'cache' => config('repositories.cache.clear'),
+            'pagination' => config('repositories.pagination'),
+            'parameters' => config('repositories.parameters')
+        ];
         $this->initialize();
         $this->makeModel();
         $this->boot();
+        $this->model = $this->filterAttributes($this->model);
+        
     }
     public abstract function model();
     public abstract function boot();
@@ -50,7 +58,7 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
     
     public function makeModel()
     {
-        $model = $this->app->make($this->model());
+        $model = app()->make($this->model());
         if(!$model instanceof Model)
         {
             throw new RepositoryException("Class {$this->model()} must be an instance of Illuminate\\Database\\Eloquent\\Model");
@@ -107,7 +115,7 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
             $this->globalCriteria->push($criteria);
         }
         return $this;
-    }
+    } 
 
     public function pushManyCriterias(...$criterias)
     {
@@ -118,14 +126,35 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
         return $this;
     }
 
-    public function removeCriteria(Criteria $criteria)
+    public function pushCriteriaWhen(array $arguments)
+    {
+        foreach($arguments as $condition => $criteria)
+        {
+            if($condition && $criteria instanceof Criteria)
+            {
+                $this->pushCriteria($criteria);
+            }
+        }
+    }
+    public function popCriteria(Criteria $criteria)
     {
         $this->globalCriteria = $this->globalCriteria->reject(function($item) use ($criteria){
             return $item == $criteria;
         });
     }
 
-    public function removeManyCriterias(...$criterias)
+    public function popCriteriaWhen(array $arguments)
+    {
+        foreach($arguments as $condition => $criteria)
+        {
+            if($condition && $criteria instanceof Criteria)
+            {
+                $this->popCriteria($criteria);
+            }
+        }
+    }
+
+    public function popManyCriterias(...$criterias)
     {
         foreach($criterias as $criteria)
         {
@@ -263,15 +292,23 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
     public function firstOrNew(array $attributes)
     {
         $this->applyCriteria();
-        $this->model = $this->model->firstOrNew($attributes);
-        return $this;
+        $this->model->firstOrNew($attributes);
+        if(config('repositories.cache.clear.created'))
+        {
+            $this->flushCaches();
+        }
+        return $this->model;
     }
 
     public function firstOrCreate(array $attributes)
     {
         $this->applyCriteria();
-        $this->model = $this->model->firstOrCreate($attributes);
-        return $this;
+        $this->model->firstOrCreate($attributes);
+        if(config('repositories.cache.clear.created'))
+        {
+            $this->flushCaches();
+        }
+        return $this->model;
     }
 
     public function limit($limit = 15)
@@ -295,17 +332,17 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
         return $this;
     }
 
-    public function paginate($limit = 15, $columns = ['*'])
+    public function paginate($limit = null, $columns = '*')
     {
         $this->applyCriteria();
-        $this->model = $this->model->paginate($limit, $columns);
+        $this->model = $this->model->paginate($limit ?? $this->config->pagination['limit'], $columns);
         return $this;
     }
 
-    public function where($field, $value = null)
+    public function where($field,$operator, $value = null)
     {
         $this->applyCriteria();
-        $this->model = $this->model->where($field, $value);
+        $this->model = $this->model->where($field,$operator,$value);
         return $this;
     }
 
@@ -353,22 +390,52 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
 
     public function create($values)
     {
-        return $this->model->create($values);
+        $this->model->create($values);
+        if($this->config->cache['created'])
+        {
+            $this->flushCaches();
+        }
+        return $this->model;
     }
 
     public function update($values)
     {
-        return $this->model->update($values);
+        $this->model->update($values);
+        if($this->config->cache['updated'])
+        {
+            $this->flushCaches();
+        }
+        return $this->model;
     }
 
     public function delete()
     {
-        return $this->model->delete();
+        $this->model->delete();
+        if($this->config->cache['deleted'])
+        {
+            $this->flushCaches();
+        }
+        return $this->model;
+    }
+
+    public function replicate()
+    {
+        $this->model->delete();
+        if($this->config->cache['created'])
+        {
+            $this->flushCaches();
+        }
+        return $this->model;
     }
 
     public function updateOrCreate(array $attributes, array $values = [])
     {
-        return $this->model->updateOrCreate($attributes, $values);
+        $this->model->updateOrCreate($attributes, $values);
+        if($this->config->cache['created'] || $this->config->cache['updated'])
+        {
+            $this->flushCaches();
+        }
+        return $this->model;
     }
 
     public function has($relation)
@@ -402,6 +469,12 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
     public function whereHas($relation, $closure)
     {
         $this->model = $this->model->whereHas($relation, $closure);
+        return $this;
+    }
+
+    public function orWhereHas($relation, $closure)
+    {
+        $this->model = $this->model->orWhereHas($relation, $closure);
         return $this;
     }
 
@@ -439,10 +512,28 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
 
     public function search($fields,$value)
     {
-        foreach(Arr::wrap($fields) as $builder)
+        $this->where(function (Builder $query) use ($fields, $value) 
         {
-            $this->model = $this->model->orWhere($builder,'LIKE',"%$value%");
-        }
+            foreach(Arr::wrap($fields) as $attribute) 
+            {
+                $query->when(
+                    Str::contains($attribute, '.'),
+                    function (Builder $query) use ($attribute, $value) 
+                    {
+                        [$relationName, $relationAttribute] = explode('.', $attribute);
+    
+                        $query->orWhereHas($relationName, function (Builder $query) use ($relationAttribute, $value) 
+                        {
+                            $query->where($relationAttribute, 'LIKE', "%{$value}%");
+                        });
+                    },
+                    function (Builder $query) use ($attribute, $value) 
+                    {
+                        $query->orWhere($attribute, 'LIKE', "%{$value}%");
+                    }
+                );
+            }
+        });
         return $this;
     }
     public function hidden($columns = ['*'])
@@ -455,6 +546,19 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
     {
         $this->model = $this->model->setVisible(Arr::wrap($columns));
         return $this;
+    }
+
+    public function filterAttributes($model)
+    {
+        $searchCriteria = new AdvancedSearchCriteria();
+        $filter = app()->request->{$this->config->parameters['filter']};
+
+        $findSearchCriteria = collect($this->globalCriteria)->filter(function($item) use ($searchCriteria){
+            return get_class($item) == get_class($searchCriteria);
+        });
+
+        return $searchCriteria->filterAttributes($model,$findSearchCriteria);
+        
     }
 
     public function export()
@@ -486,6 +590,10 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
             });
         }
     }
+    public function getCache($cacheKey)
+    {
+        return Cache::get("{$this->model()}.$cacheKey");
+    }
     /**
      * Remove a specific cache key
      * @param : $cacheKeys
@@ -497,14 +605,13 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
     }
 
     /**
-     * Mapping cache keys and remove cache
+     * Flush all cache
      */
     public function flushCaches()
     {
-        collect($this->storeKeys)->each(function($key){
-            $this->forgetCache($key);
-        });
+        Cache::flush();
     }
+    
     /**
      * Call default Model methods when user trigger undefined method in repository
      */

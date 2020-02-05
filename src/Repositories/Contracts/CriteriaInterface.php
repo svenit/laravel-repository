@@ -8,9 +8,11 @@ interface CriteriaInterface
 {
     public function applyCriteria();
     public function pushCriteria(Criteria $criteria);
+    public function pushCriteriaWhen(array $arguments);
+    public function pushManyCriterias(...$criterias);
     public function skipCriteria();
     public function getByCriteria(Criteria $criteria);
-    public function pushManyCriterias(...$criterias);
-    public function removeCriteria(Criteria $criteria);
-    public function removeManyCriterias(...$criterias);
+    public function popCriteria(Criteria $criteria);
+    public function popCriteriaWhen(array $arguments);
+    public function popManyCriterias(...$criterias);
 }

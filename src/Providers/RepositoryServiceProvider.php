@@ -2,7 +2,6 @@
 
 namespace VyDev\Providers;
 
-use GenerateCacheKey;
 use Illuminate\Support\Composer;
 use VyDev\Commands\MakeCriteria;
 use VyDev\Commands\MakeRepository;
@@ -17,12 +16,6 @@ class RepositoryServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerCommands();
-        /**
-         * Load helper class
-         */
-        $this->app->singleton(GenerateCacheKey::class,function($app){
-            return new GenerateCacheKey(config('repositories.cache.cache_time'));
-        });
     }
 
     public function boot()
@@ -48,6 +41,7 @@ class RepositoryServiceProvider extends ServiceProvider
     {
         $this->commands([
             MakeRepository::class,
+            MakeCriteria::class
         ]);
     }
 }
