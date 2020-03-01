@@ -7,7 +7,12 @@ interface RepositoryInterface
     public function all();
     public function get($columns = ['*']);
     public function first();
+    public function latest();
+    public function random();
+    public function exists();
     public function find($id);
+    public function findOrFail($id);
+    public function findOrNew($id, $columns = ['*']);
     public function pluck($columns,$key);
     public function sync($attributes);
     public function syncWithoutDetaching($attributes);
@@ -16,14 +21,16 @@ interface RepositoryInterface
     public function count();
     public function firstOrNew(array $attributes);
     public function firstOrCreate(array $attributes);
-    public function limit($limit);
-    public function take($take);
+    public function limit($arg);
+    public function take($arg);
+    public function offset($arg);
     public function paginate($limit = 15, $columns = ['*']);
     public function where($field,$operator, $value = null);
     public function whereIn($field,$values);
     public function whereNotIn($field,$values);
     public function whereBetween($field,$values);
     public function create($values);
+    public function save();
     public function update($values);
     public function delete();
     public function updateOrCreate(array $attributes, array $values = []);
@@ -34,9 +41,10 @@ interface RepositoryInterface
     public function whereHas($relation, $closure);
     public function orderBy($column, $direction = 'asc');
     public function load($relation);
-    public function relation($relation);
     public function search($fields,$value);
     public function hidden($columns = ['*']);
     public function visible($columns = ['*']);
+    public function increment($field, $quantity = null);
+    public function decrement($field, $quantity = null);
     public function export();
 }

@@ -32,7 +32,7 @@ return [
     | The namespace for the criteria classes.
     |
     */
-    'default_model' => 'App', // Example : App\\Model
+    'default_model' => 'App', // Example : App\Model
 
     /*
     |--------------------------------------------------------------------------

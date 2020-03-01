@@ -243,7 +243,7 @@ public function testRemoveCriteria()
     /* If you have 2 or more criteria and you want to remove one of theme */
     $this->user->pushManyCriterias(new UserActive(),new UserHaveFivePosts());
     /* Delete a specific criteria */
-    $this->user->removeCriteria(new UserHaveFivePosts());
+    $this->user->popCriteria(new UserHaveFivePosts());
 
     return $this->user->all()->export();
 }
@@ -266,9 +266,9 @@ public function pushCriteriaWhen($arguments);
 public function pushManyCriterias(...$criterias);
 public function skipCriteria();
 public function getByCriteria(Criteria $criteria);
-public function removeCriteria(Criteria $criteria);
+public function popCriteria(Criteria $criteria);
 public function pushCriteriaWhen($arguments);
-public function removeManyCriterias(...$criterias);
+public function popManyCriterias(...$criterias);
 ```
 
 ## Transform

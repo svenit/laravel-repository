@@ -97,7 +97,7 @@ class MakeRepository extends GeneratorCommand
         $replace = str_replace('repository_class', $this->model, $replace);
         if(isset($this->modelPath) && $this->modelPath != '@')
         {
-            $replace = str_replace('your_model_path', $this->config['model']."\\\\".$this->modelPath, $replace);
+            $replace = str_replace('your_model_path', $this->config['model']."\\".$this->modelPath, $replace);
         }
         return $replace;
     }

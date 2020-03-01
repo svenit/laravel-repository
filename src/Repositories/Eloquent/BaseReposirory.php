@@ -29,7 +29,6 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
     protected $criteria;
     protected $transform;
     protected $skipCriteria;
-    protected $storeKeys = [];
     protected $config;
 
     public function __construct()
@@ -49,7 +48,7 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
     }
     public abstract function model();
     public abstract function boot();
-    public abstract function transform(RepositoryInterface $repository);
+    public abstract function transform($model);
 
     public function initialize()
     {
@@ -104,8 +103,8 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
 
     public function reset()
     {
-        $this->criteria = new Collection;
         $this->makeModel();
+        $this->criteria = new Collection;
     }
 
     public function pushCriteria(Criteria $criteria)
@@ -117,7 +116,7 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
         return $this;
     } 
 
-    public function pushManyCriterias(...$criterias)
+    public function pushManyCriterias(Criteria ...$criterias)
     {
         foreach($criterias as $criteria)
         {
@@ -154,7 +153,7 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
         }
     }
 
-    public function popManyCriterias(...$criterias)
+    public function popManyCriterias(Criteria ...$criterias)
     {
         foreach($criterias as $criteria)
         {
@@ -208,6 +207,31 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
         }
     }
 
+    public function __get($attribute)
+    {
+        return $this->getAttribute($attribute);
+    }
+
+    public function __set($attribute,$value)
+    {
+        return $this->setAttribute($attribute, $value);
+    }
+
+    public function getAttribute($attribute)
+    {
+        return $this->model->{$attribute};
+    }
+
+    public function setAttribute($attribute, $value)
+    {
+        $this->model->{$attribute} = $value;
+    }
+
+    public function exists()
+    {
+        return $this->model->exists();
+    }
+
     public function all($columns = '*')
     {
         $this->applyCriteria();
@@ -235,10 +259,10 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
         return $this;
     }
 
-    public function lastest()
+    public function latest()
     {
         $this->applyCriteria();
-        $this->model = $this->model->lastest();
+        $this->model = $this->model->latest();
         return $this;
     }
 
@@ -254,6 +278,18 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
         $this->applyCriteria();
         $this->model = $this->model->find($id);
         return $this;
+    }
+
+    public function findOrFail($id)
+    {
+        $this->applyCriteria();
+        $this->model = $this->model->findOrFail($id);
+        return $this;
+    }
+
+    public function findOrNew($id, $columns = ['*'])
+    {
+        return $this->model->findOrNew($id, $columns = ['*']);
     }
 
     public function pluck($column, $key = null)
@@ -275,7 +311,9 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
 
     public function attach($attributes)
     {
-        return $this->model->attach(Arr::wrap($attributes));
+        $model = $this->model->attach(Arr::wrap($attributes));
+        $this->flushCaches();
+        return $model;
     }
 
     public function detach($attributes)
@@ -311,17 +349,24 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
         return $this->model;
     }
 
-    public function limit($limit = 15)
+    public function limit($arg = 15)
     {
         $this->applyCriteria();
-        $this->model = $this->model->limit($limit);
+        $this->model = $this->model->limit($arg);
         return $this;
     }
 
-    public function take($take = 15)
+    public function take($arg = 15)
     {
         $this->applyCriteria();
-        $this->model = $this->model->take($take);
+        $this->model = $this->model->take($arg);
+        return $this;
+    }
+
+    public function offset($arg = 15)
+    {
+        $this->applyCriteria();
+        $this->model = $this->model->offset($arg);
         return $this;
     }
 
@@ -339,7 +384,7 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
         return $this;
     }
 
-    public function where($field,$operator, $value = null)
+    public function where($field,$operator = null, $value = null)
     {
         $this->applyCriteria();
         $this->model = $this->model->where($field,$operator,$value);
@@ -390,52 +435,57 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
 
     public function create($values)
     {
-        $this->model->create($values);
+        $model = $this->model->create($values);
         if($this->config->cache['created'])
         {
             $this->flushCaches();
         }
-        return $this->model;
+        return $model;
+    }
+
+    public function save()
+    {
+        return $this->model->save();
     }
 
     public function update($values)
     {
-        $this->model->update($values);
+        $model = $this->model->update($values);
         if($this->config->cache['updated'])
         {
             $this->flushCaches();
         }
-        return $this->model;
+        return $model;
     }
 
     public function delete()
     {
-        $this->model->delete();
+        $model = $this->model->delete();
         if($this->config->cache['deleted'])
         {
             $this->flushCaches();
         }
-        return $this->model;
+        return $model;
     }
 
     public function replicate()
     {
-        $this->model->delete();
+        $model = $this->model->replicate();
         if($this->config->cache['created'])
         {
             $this->flushCaches();
         }
-        return $this->model;
+        return $model;
     }
 
     public function updateOrCreate(array $attributes, array $values = [])
     {
-        $this->model->updateOrCreate($attributes, $values);
+        $model = $this->model->updateOrCreate($attributes, $values);
         if($this->config->cache['created'] || $this->config->cache['updated'])
         {
             $this->flushCaches();
         }
-        return $this->model;
+        return $model;
     }
 
     public function has($relation)
@@ -502,13 +552,6 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
         $this->model = $this->model->load($relation);
         return $this;
     }
-    
-    public function relation($relation)
-    {
-        $this->applyCriteria();
-        $this->model = $this->model->{$relation}()->get();
-        return $this;
-    }
 
     public function search($fields,$value)
     {
@@ -547,6 +590,16 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
         $this->model = $this->model->setVisible(Arr::wrap($columns));
         return $this;
     }
+    
+    public function increment($field, $quantity = null)
+    {
+        return $this->model->increment($field, $quantity);
+    }
+
+    public function decrement($field, $quantity)
+    {
+        return $this->model->decrement($field, $quantity);
+    }
 
     public function filterAttributes($model)
     {
@@ -571,8 +624,6 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
 
     public function exportWithCache($cacheKeys,$time = null)
     {
-        $this->storeKeys[] = $cacheKeys;
-
         $this->setTransform();
         $result = $this->model;
         $this->reset();
@@ -600,7 +651,6 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
      */
     public function forgetCache($cacheKeys)
     {
-        $this->storeKeys = array_diff($this->storeKeys,[$cacheKeys]);
         return Cache::forget("{$this->model()}.$cacheKeys");
     }
 
