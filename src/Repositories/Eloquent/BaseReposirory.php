@@ -232,6 +232,13 @@ abstract class BaseRepository implements RepositoryInterface,CriteriaInterface,T
         return $this->model->exists();
     }
 
+    public function cursor()
+    {
+        $this->applyCriteria();
+        $this->model = $this->model->cursor();
+        return $this;
+    }
+
     public function all($columns = '*')
     {
         $this->applyCriteria();
