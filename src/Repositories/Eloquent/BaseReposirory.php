@@ -496,7 +496,6 @@ abstract class BaseRepository implements RepositoryInterface, CriteriaInterface
         });
         return $this;
     }
-
     public function hidden($columns = ['*'])
     {
         $this->model = $this->model->setHidden(Arr::wrap($columns));
@@ -508,7 +507,6 @@ abstract class BaseRepository implements RepositoryInterface, CriteriaInterface
         $this->model = $this->model->setVisible(Arr::wrap($columns));
         return $this;
     }
-
     public function increment($field, $quantity = null)
     {
         return $this->model->increment($field, $quantity);

@@ -5,7 +5,6 @@
  */
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Repository namespace
@@ -15,7 +14,6 @@ return [
     |
     */
     'repository_namespace' => 'App\Repositories\Eloquent',
-
     /*
     |--------------------------------------------------------------------------
     | Criteria namespace
