@@ -1,0 +1,21 @@
+<?php
+
+namespace repository_namespace;
+
+use VyDev\Repositories\Eloquent\BaseRepository;
+use VyDev\Repositories\Criteria\AdvancedSearchCriteria;
+
+class repository_class extends BaseRepository
+{
+
+    public function model()
+    {
+        return 'your_model_path';
+    }
+
+    public function boot()
+    {
+
+    }
+
+}

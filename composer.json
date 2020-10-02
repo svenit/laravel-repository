@@ -1,0 +1,40 @@
+{
+    "name": "vydev/repository",
+    "description": "Laravel Repositories is a package for Laravel 5 or higher which is used to abstract the database layer. This makes applications much easier to maintain.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Lê Quang Vỹ",
+            "email": "lequangvy2k@gmail.com"
+        }
+    ],
+    "keywords":[
+        "Laravel",
+        "Laravel Repository",
+        "VyDev Repository",
+        "Easy Repository",
+        "Repository Parttern"
+    ],
+    "support": {
+        "email": "lequangvy2k@gmail.com",
+        "issues":"https://github.com/svenit/laravel-repository/issues",
+        "wiki":"https://github.com/svenit/laravel-repository",
+        "source":"https://github.com/svenit/laravel-repository",
+        "docs": "https://github.com/svenit/laravel-repository"
+    },
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^7.1.3",
+        "illuminate/config": "~5.0|~6.0|~7.0",
+        "illuminate/support": "~5.0|~6.0|~7.0",
+        "illuminate/database": "~5.0|~6.0|~7.0",
+        "illuminate/pagination": "~5.0|~6.0|~7.0",
+        "illuminate/console": "~5.0|~6.0|~7.0",
+        "illuminate/filesystem": "~5.0|~6.0|~7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "VyDev\\": "src"
+        }
+    }
+}
