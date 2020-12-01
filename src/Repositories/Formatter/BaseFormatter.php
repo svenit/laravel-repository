@@ -7,7 +7,7 @@ use Illuminate\Contracts\Pagination\Paginator;
 use VyDev\Repositories\Contracts\FormatterInterface;
 use VyDev\Repositories\Exceptions\RepositoryException;
 
-class BaseFormatter implements FormatterInterface
+trait BaseFormatter
 {
     static $data;
     static $method;
