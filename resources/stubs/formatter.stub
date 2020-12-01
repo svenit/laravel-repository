@@ -4,7 +4,8 @@ namespace formatter_namespace;
 
 use VyDev\Repositories\Formatter\BaseFormatter;
 
-class formatter_class extends BaseFormatter
+class formatter_class
 {
+    use BaseFormatter;
 
 }
