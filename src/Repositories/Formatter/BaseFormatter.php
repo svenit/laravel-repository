@@ -32,9 +32,11 @@ trait BaseFormatter
 
     public static function formatCommon()
     {
-        return static::$data->map(function($item, $key) {
+        return static::$data->map(function ($item, $key) {
             return $item = static::formatItem($item);
-        });
+        })->filter(function ($item) {
+            return isset($item);
+        })->values();
     }
 
     public static function formatPaginate()
@@ -44,7 +46,7 @@ trait BaseFormatter
         ]);
     }
 
-    public static function __call($method, $arguments)
+    public function __call($method, $arguments)
     {
         return call_user_func_array([
             new static,
