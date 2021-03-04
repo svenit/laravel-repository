@@ -5,6 +5,8 @@
 
 Laravel Repositories is a package for Laravel 5 which is used to abstract the database layer. This makes applications much easier to maintain.
 
+Current Version: 2.0.2
+
 ## Installation
 
 https://packagist.org/packages/vydev/easy-repository
