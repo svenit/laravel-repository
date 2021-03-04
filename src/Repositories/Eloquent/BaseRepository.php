@@ -170,7 +170,9 @@ abstract class BaseRepository implements RepositoryInterface, CriteriaInterface
 
     public function exists()
     {
-        return $this->model->exists();
+        $result = $this->model->exists();
+        $this->reset();
+        return $result;
     }
 
     public function cursor()
