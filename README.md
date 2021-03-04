@@ -1,4 +1,4 @@
-# Easy Repository
+# Easy Repository Version 2
 
 [![Build Status](https://travis-ci.org/Juniorsz/easy-repository.svg?branch=master)](https://travis-ci.org/Juniorsz/easy-repository)
 [![Maintainability](https://api.codeclimate.com/v1/badges/69006185e63829b6a304/maintainability)](https://codeclimate.com/github/Juniorsz/easy-repository/maintainability)
@@ -15,7 +15,7 @@ Run the following command from you terminal:
  ```bash
 $ composer require vydev/easy-repository
  ```
- 
+
 ## Usage
 
 In ```config/app.php```
@@ -50,7 +50,7 @@ $ php artisan make:repository UserRepository
 
 Then you can enter the name of Model to automatic generate or skip by enter @
 
-If console throw error ```Command "make:repository" is not defined."``` 
+If console throw error ```Command "make:repository" is not defined."```
 
 In : ```app/Console/Kernel.php```
 
@@ -69,7 +69,7 @@ Then run ```php artisan optimize:clear```
 
 
 ```php
-<?php 
+<?php
 
 namespace App\Repositories\Eloquent;
 
@@ -207,14 +207,14 @@ $ php artisan make:criteria User/UserActive
 ```
 
 ```php
-<?php 
+<?php
 
 namespace App\Repositories\Criteria\User;
 
 use VyDev\Repositories\Contracts\RepositoryInterface;
 use VyDev\Repositories\Criteria\Criteria;
 
-class UserActive extends Criteria 
+class UserActive extends Criteria
 {
     public function apply($model, RepositoryInterface $repository)
     {
@@ -348,7 +348,7 @@ Request all data without filter by request
     }
 ]
 ```
-Try it : 
+Try it :
 
 ```https://yourdomain.example/products?search=name:LIKE:Sam%20Sung```
 
