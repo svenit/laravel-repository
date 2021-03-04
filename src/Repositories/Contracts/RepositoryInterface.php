@@ -13,7 +13,7 @@ interface RepositoryInterface
     public function find($id);
     public function findOrFail($id);
     public function findOrNew($id, $columns = ['*']);
-    public function pluck($columns,$key);
+    public function pluck($column, $key = null);
     public function sync($attributes);
     public function syncWithoutDetaching($attributes);
     public function attach($attributes);
@@ -21,11 +21,11 @@ interface RepositoryInterface
     public function count();
     public function firstOrNew(array $attributes);
     public function firstOrCreate(array $attributes);
-    public function limit($arg);
-    public function take($arg);
-    public function offset($arg);
+    public function limit($arg = 15);
+    public function take($arg = 15);
+    public function offset($arg = 15);
     public function paginate($limit = 15, $columns = ['*']);
-    public function where($field,$operator, $value = null);
+    public function where($field, $operator = null, $value = null);
     public function whereIn($field,$values);
     public function whereNotIn($field,$values);
     public function whereBetween($field,$values);
